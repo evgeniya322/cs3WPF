@@ -22,18 +22,21 @@ namespace MailSender
     /// </summary>
     public partial class WpfMailSender : Window
     {
-        public static List<string> listStrMails;
+        public static List<string> listStrMails=new List<string>();
         public static List<string> mails;
-        string senderMail;
-        string smtp;
-        int port;
+        Server senderServer;
+
+
         public WpfMailSender()
         {
             InitializeComponent();
         }
         private void BtnSendEmail_Click(object sender, RoutedEventArgs e)
         {
-            senderMail = txbEmail.Text + cbMail.SelectedItem;
+           
+            senderServer = Test.Servers.FirstOrDefault(server => server.Name == cbMail.SelectedItem.ToString());
+            string senderMail = txbEmail.Text + senderServer.Name;
+
             string strPassword = passwordBox.Password;  // для WinForms - string strPassword = passwordBox.Text;
             foreach (string mail in listStrMails)
             {
@@ -47,23 +50,8 @@ namespace MailSender
                                                      // Авторизуемся на smtp-сервере и отправляем письмо
                                                      // Оператор using гарантирует вызов метода Dispose, даже если при вызове 
                                                      // методов в объекте происходит исключение.
-                    switch (cbMail.SelectedIndex)
-                    {
-                        case 0:
-                            smtp = "smtp.mail.ru";
-                            port = 25;
-                            break;
-                        case 1:
-                            smtp = "smtp.yandex.ru";
-                            port = 25;
-                            break;
-                        case 2:
-                            smtp = "smtp.gmail.com";
-                            port = 58;
-                            break;
-                    }
 
-                    using (SmtpClient sc = new SmtpClient(smtp, port))
+                    using (SmtpClient sc = new SmtpClient(senderServer.Address, senderServer.Port))
                     {
                         sc.EnableSsl = true;
                         sc.Credentials = new NetworkCredential(senderMail, strPassword);
@@ -102,12 +90,12 @@ namespace MailSender
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            listStrMails = new List<string>();
-            mails = new List<string> { "@mail.ru", "@yandex.ru", "@gmail.com" };
-            foreach (var mail in mails)
+           
+            foreach (var mail in Test.Servers)
             {
-                cbMail.Items.Add(mail);
+                cbMail.Items.Add(mail.Name);
             }
+           
         }
     }
 }
