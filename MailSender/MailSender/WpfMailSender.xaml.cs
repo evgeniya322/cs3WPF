@@ -78,7 +78,8 @@ namespace MailSender
                     }
                 } //using (MailMessage mm = new MailMessage("sender@yandex.ru", mail))
             }
-            MessageBox.Show("Работа завершена.");
+            SendEndWindow sew = new SendEndWindow();
+            sew.ShowDialog();
         }
         private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
         {
